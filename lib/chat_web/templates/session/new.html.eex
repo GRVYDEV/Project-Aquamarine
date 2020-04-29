@@ -1,0 +1,26 @@
+
+    <div class="bg-indigo-600 rounded-lg h-full w-full flex flex-col justify-center content-center px-24 relative">
+    <a href="<%= Routes.session_path(@conn, :index) %>"><i class="fas fa-arrow-circle-left absolute text-bg text-5xl back-icon"></i></a>
+
+        <h1 class="text-6xl font-semibold text-center text-bg">Sign In.</h1>
+
+        <%= form_for @conn, Routes.session_path(@conn, :create), [as: :session], fn f -> %>
+        <div class="form-group flex flex-col w-1/3 mx-auto">
+            <%= label f, :email, class: "control-label text-bg" %>
+            <%= text_input f, :email, class: "  input text-white  ", placeholder: "Email", required: true, autofocus: true  %>
+            <%= error_tag f, :email %>
+        </div>
+
+        <div class="form-group flex flex-col w-1/3 mx-auto">
+            <%= label f, :password, class: "control-label text-bg"  %>
+            <%= password_input f, :password, class: "  input text-white ", placeholder: "Password", required: true  %>
+            <%= error_tag f, :password  %>
+        </div>
+        <div class="flex flex-row mt-8 w-1/3 mx-auto justify-center">
+            <%= submit "Go.", class: "btn green text-indigo-600 h-16 rounded-lg font-semibold text-2xl bg w-1/3" %>
+
+        </div>
+
+        <% end %>
+    </div>
+

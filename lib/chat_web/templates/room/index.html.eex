@@ -1,0 +1,129 @@
+
+    <div class="col-md-3 bg-indigo-600 text-bg   h-full rounded-l-lg  " style="padding-left: 0 !important; padding-right: 0 !important;">
+        <%= if @signed_in? do %>
+            <div class="h-24  rounded-tl-lg flex flex-row mb-2 justify-around border-b border-bg w-90 mx-auto ">
+            <div class="rounded-full h-12 w-12 lg:h-16 lg:w-16 flex items-center justify-center bg my-auto lg:ml-4 text-indigo-600" id="user-acct">
+                <a href="<%= Routes.session_path(@conn, :index) %>" class=" h-12 w-12lg:h-16 lg:w-16 lg:text-2xl text-xl flex items-center justify-center rounded-full">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+            <div class="flex flex-col lg:ml-4 mt-2  w-2/3 lg:text-3xl text-2xl">
+                <div class="font-semibold ">Welcome,</div>
+                <div class="lg:ml-16 ml-4 -mt-2 "><%= @current_user.username%></div>
+            </div>
+
+                <!-- h1 class="text-4xl text-bg">Welcome <%= link @current_user.username, to: Routes.session_path(@conn, :index), class: "text-bg"  %></h1 -->
+            </div>
+        <% end %>
+        <%= link "Rooms", to: Routes.room_path(@conn, :index), class: "lg:text-4xl text-3xl font-bold ml-8 text-bg" %>
+        <ul class="mt-2 w-full">
+        <%= for room <- @rooms do %>
+            <li class="m-0 lg:text-3xl text-2xl">
+                <a href="<%= Routes.room_path(@conn, :show, room.id) %>" class="h-full w-full ">
+                    <div class="py-8 pl-16 ">
+                        <i class="fas fa-door-closed mr-8 "></i> <%= room.name %>
+                    </div>
+                </a>
+            </li>
+        <% end %>
+        </ul>
+    </div>
+    <div class="col-md-9 p-0 h-full shadow-inner">
+        <div class="jumbotron text-center text-gray-500 flex flex-col h-full rounded-l-none main-accent m-0 relative pt-24 pb-0 overflow-x-hidden">
+            <%= if @activeroom do %>
+                <%= if @edit do %>
+                    <h2 class="text-5xl font-bold text-white">Edit <%= @activeroom.name %> </h2>
+                    <%= form_for @changeset, Routes.room_path(@conn, :update, @activeroom.id), fn f -> %>
+                    <div class="form-group mx-auto">
+                        <%= label f, :name, class: "control-label text-white" %>
+                        <%= text_input f, :name, class: " w-1/3 text-white text-3xl input"  %>
+                        <%= error_tag f, :name %>
+                    </div>
+
+                    <div class="form-group">
+                        <%= label f, :topic, class: "control-label text-white"  %>
+                        <%= text_input f, :topic, class: " w-1/3 text-white text-3xl input"  %>
+                        <%= error_tag f, :topic  %>
+                    </div>
+
+                    <div class="form-group">
+                        <%= label f, :description, class: "control-label text-white"  %>
+                        <%= text_input f, :description, class: " w-1/3 text-white text-3xl input"  %>
+                        <%= error_tag f, :description %>
+                    </div>
+                    <div class="flex flex-col mt-4 w-full">
+                        <%= submit "Update", class: "btn text-white text-xl bg-indigo-600 w-1/3 mt-4 mx-auto" %>
+                        <%= link "Delete", to: Routes.room_path(@conn, :delete, @activeroom), method: :delete, class: "btn mx-auto text-white bg-red-600 mt-4 text-xl py-2 w-1/3"  %>
+                    </div>
+
+                    <% end %>
+
+                <% else %>
+                    <nav class="bg-indigo-600 h-24 w-full absolute top-0 left-0 nav-shadow rounded-tr-lg flex flex-row justify-between p-4 animated slideInLeft">
+                        <h1 class="text-3xl lg:text-4xl font-semibold text-bg  pl-4"><%= @activeroom.name %> : <span class="font-normal"><%= @activeroom.description %></span></h1>
+                        <div class="flex lg:text-3xl text-2xl my-auto flex-row w-1/4 text-bg justify-between">
+                            <div class="flex flex-row w-1/3 ">
+                                <a href="<%= Routes.room_path(@conn, :edit, @activeroom.id) %>" class="green-a"><i class="fas fa-edit"></i></a>
+
+                            </div>
+                            <div class="flex flex-row w-1/3 "> <a href="<%= Routes.room_path(@conn, :index) %>" class="back-icon"><i class="fas fa-arrow-circle-left"></i></a></div>
+                            <div class="flex flex-row w-1/3  tt ">
+                                <div id="user-names" class="tooltiptext tooltip-bottom text-2xl p-4 font-semibold"></div>
+                                <i class="fas fa-users"></i>
+                                <div id="user-count" class="font-semibold ml-2"></div>
+                            </div>
+                        </div>
+                    </nav>
+                    <div class="flex flex-col h-full slideInLeft animated">
+                        <ul class="list-group flex-grow mt-2 flex-col-reverse overflow-y-scroll" id="display"></ul>
+                        <div class=" self-end flex flex-col w-full">
+                            <form class="input-group mb-0 mt-2 " id="message-form">
+
+                                <input type="text" class="input text-white w-4/5" id="message-body" placeholder="Message for # <%= @activeroom.name %>" autocomplete="off">
+                                <div class="input-group-append w-1/5">
+                                    <button class="btn text-3xl text-white font-semibold w-full bg-green-500" id="message-button"><i class="fas fa-paper-plane"></i></button>
+                                </div>
+                            </form>
+                            <div id="user-typing" class="m-0 ml-2 h-8 max-h-8 text-xl text-left"></div>
+
+                        </div>
+                    </div>
+                    <script>window.roomId = "<%= @activeroom.id %>"</script>
+
+                <% end %>
+                <% else %>
+                <%= if @create do %>
+                    <h2 class="text-5xl font-bold text-second-accent mb-8">Add A New Room.</h2>
+                    <%= form_for @changeset, Routes.room_path(@conn, :create), fn f -> %>
+                    <div class="form-group flex flex-col w-1/3 mx-auto">
+                        <%= label f, :name, class: "control-label text-second-accent" %>
+                        <%= text_input f, :name, class: "input text-white"  %>
+                        <%= error_tag f, :name %>
+                    </div>
+
+                    <div class="form-group flex flex-col w-1/3 mx-auto">
+                        <%= label f, :topic, class: "control-label text-second-accent"  %>
+                        <%= text_input f, :topic, class: "input text-white"  %>
+                        <%= error_tag f, :topic  %>
+                    </div>
+
+                    <div class="form-group flex flex-col w-1/3 mx-auto">
+                        <%= label f, :description, class: "control-label text-second-accent"  %>
+                        <%= text_input f, :description, class: "input text-white"  %>
+                        <%= error_tag f, :description %>
+                    </div>
+                    <div class="flex flex-row mt-8 w-1/3 mx-auto justify-center">
+                        <%= submit "Create.", class: "btn green text-second-accent h-16 rounded-lg font-semibold text-2xl bg w-2/3" %>
+                    </div>
+                    <% end %>
+                <% else %>
+                <div class="text-second-accent h-full flex justify-center content-center flex-col animated fadeIn">
+                <h1 class="text-6xl font-semibold">Welcome to Chat App</h1>
+                <h4 class="text-4xl font-normal mt-2">Join a room or create one</h4>
+                <a class="btn bg w-1/5 mx-auto mt-4 py-4 align-middle text-second-accent rounded-lg text-2xl" href="<%= Routes.room_path(@conn, :new) %> ">Create a Room</a>
+                </div>
+                <% end %>
+            <% end %>
+        </div>
+    </div>
+
