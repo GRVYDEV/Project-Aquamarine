@@ -11,6 +11,10 @@ defmodule ChatWeb.Schema.Types do
     field(:messages, list_of(:message), resolve: assoc(:messages))
   end
 
+  object :session do
+    field(:token, :string)
+  end
+
   object :room do
     field(:id, :id)
     field(:description, :string)

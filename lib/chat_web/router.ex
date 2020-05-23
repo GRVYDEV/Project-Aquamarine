@@ -16,6 +16,8 @@ defmodule ChatWeb.Router do
 
   pipeline :graphql do
     plug ChatWeb.Plug.Context
+    plug :fetch_session
+    plug :fetch_flash
   end
 
   scope "/", ChatWeb do
