@@ -22,6 +22,10 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+#Configures Guardian Auth
+config :chat, Chat.Guardian,
+  issuer: "chat",
+  secret_key: "Jbfh8/uKEylHja6tMelE2v4xDl5FPot0eecCtGcbsOF80C6h7lMJdY/PV2m+rc7k"
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
